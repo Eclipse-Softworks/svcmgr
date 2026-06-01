@@ -33,7 +33,11 @@ func InitializeVault() {
 }
 
 func createVault() (*LunarVault, error) {
-	keyPath := filepath.Join(os.Getenv("HOME"), ".config", "svcmgr", "vault.key")
+	configDir, err := os.UserConfigDir() //replace os.Getenv("HOME") with os.UserConfigDir() for cross-platform 
+	if err != nil {                      // return prper error when directory cant be dtermined
+		return nil, err
+	}
+	keyPath := filepath.Join(configDir, "svcmgr", "vault.key")
 	if err := os.MkdirAll(filepath.Dir(keyPath), 0700); err != nil {
 		return nil, err
 	}
@@ -57,6 +61,7 @@ func createVault() (*LunarVault, error) {
 }
 
 func EncryptConfig(data []byte) ([]byte, error) {
+	InitializeVault()                                //vault not initialized
 	block, err := aes.NewCipher(vault.key)
 	if err != nil {
 		return nil, err
@@ -76,6 +81,7 @@ func EncryptConfig(data []byte) ([]byte, error) {
 }
 
 func DecryptConfig(data []byte) ([]byte, error) {
+	InitializeVault()                                //guard as EncryptConfig vault 	
 	block, err := aes.NewCipher(vault.key)
 	if err != nil {
 		return nil, err
