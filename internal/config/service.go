@@ -1,9 +1,7 @@
 package config
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
 )
 
 // Service represents a service configuration.
@@ -17,23 +15,16 @@ type Service struct {
 	Extra    string `json:"extra"` // Add the Extra field
 }
 
-func (s Service) Save() any {
-	panic("unimplemented")
-}
-
-// LoadService loads a service configuration from a JSON file.
-func LoadService(filePath string) (*Service, error) {
-	file, err := os.Open(filePath)
+// LoadService looks up a service by name in the encrypted store.
+func LoadService(name string) (*Service, error) {
+	services, err := LoadServices()
 	if err != nil {
-		return nil, fmt.Errorf("could not open file: %v", err)
+		return nil, err
 	}
-	defer file.Close()
-
-	var service Service
-	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&service); err != nil {
-		return nil, fmt.Errorf("could not decode JSON: %v", err)
+	for i := range services {
+		if services[i].Name == name {
+			return &services[i], nil
+		}
 	}
-
-	return &service, nil
+	return nil, fmt.Errorf("service %q not found", name)
 }
