@@ -1,4 +1,4 @@
-﻿package services
+package services
 
 import (
 	"github.com/moon9t/svcmgr/internal/config"
@@ -68,6 +68,10 @@ func getHandler(serviceType string) Handler {
 		return &RedisHandler{}
 	case "http":
 		return &HTTPHandler{}
+	case "ssh":
+		return &SSHHandler{}
+	case "mysql":
+		return &MySQLHandler{}
 	// ... existing handlers ...
 	default:
 		return nil
@@ -77,6 +81,5 @@ func getHandler(serviceType string) Handler {
 type PostgresHandler struct{}
 
 func (p *PostgresHandler) Connect(service config.Service, password string) error {
-	// Implement the connection logic here
-	return nil
+	return p.connect(service, password)
 }
