@@ -6,9 +6,7 @@ import (
 )
 
 func GetService(serviceName string) (*Service, error) {
-	// Implement the logic to retrieve the service based on the serviceName
-	// For now, return a dummy service and nil error
-	return &Service{Username: "dummyUser"}, nil
+	return LoadService(serviceName)
 }
 
 const (
