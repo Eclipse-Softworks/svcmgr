@@ -42,10 +42,12 @@ func (h *MySQLHandler) Connect(s config.Service, pwd string) error {
 		"-h", s.Host,
 		"-u", s.Username,
 		"-P", fmt.Sprintf("%d", s.Port),
-		fmt.Sprintf("-p%s", pwd),
 	)
 
 	log.Debug().Str("command", cmd.String()).Msg("Executing MySQL command")
+	if pwd != "" {
+		cmd.Env = append(os.Environ(), "MYSQL_PWD="+pwd)
+	}
 	return executeCommand(cmd, "")
 }
 

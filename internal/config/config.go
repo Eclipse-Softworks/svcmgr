@@ -1,4 +1,4 @@
-﻿package config
+package config
 
 import (
 	"encoding/json"
@@ -7,15 +7,6 @@ import (
 
 	"github.com/rs/zerolog/log"
 )
-
-type SvcService struct {
-	Name     string `json:"name"`
-	Type     string `json:"type"`
-	Category string `json:"category,omitempty"`
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	Username string `json:"username"`
-}
 
 const configDirName = "svcmgr"
 
@@ -27,7 +18,7 @@ func getConfigPath() string {
 	return filepath.Join(configDir, configDirName, "services.enc")
 }
 
-func (s *SvcService) Save() error {
+func (s Service) Save() error {
 	services, err := LoadServices()
 	if err != nil {
 		return err
@@ -37,22 +28,22 @@ func (s *SvcService) Save() error {
 	found := false
 	for i, existing := range services {
 		if existing.Name == s.Name {
-			services[i] = *s
+			services[i] = s
 			found = true
 			break
 		}
 	}
 	if !found {
-		services = append(services, *s)
+		services = append(services, s)
 	}
 
 	return saveServices(services)
 }
 
-func LoadServices() ([]SvcService, error) {
+func LoadServices() ([]Service, error) {
 	configPath := getConfigPath()
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		return []SvcService{}, nil
+		return []Service{}, nil
 	}
 
 	encryptedData, err := os.ReadFile(configPath)
@@ -65,7 +56,7 @@ func LoadServices() ([]SvcService, error) {
 		return nil, err
 	}
 
-	var services []SvcService
+	var services []Service
 	if err := json.Unmarshal(decryptedData, &services); err != nil {
 		return nil, err
 	}
@@ -73,7 +64,7 @@ func LoadServices() ([]SvcService, error) {
 	return services, nil
 }
 
-func saveServices(services []SvcService) error {
+func saveServices(services []Service) error {
 	data, err := json.MarshalIndent(services, "", "  ")
 	if err != nil {
 		return err
@@ -90,4 +81,19 @@ func saveServices(services []SvcService) error {
 	}
 
 	return os.WriteFile(configPath, encryptedData, 0600)
+}
+
+// RemoveService deletes a service by name from the encrypted store.
+func RemoveService(name string) (bool, error) {
+	services, err := LoadServices()
+	if err != nil {
+		return false, err
+	}
+	for i := range services {
+		if services[i].Name == name {
+			services = append(services[:i], services[i+1:]...)
+			return true, saveServices(services)
+		}
+	}
+	return false, nil
 }

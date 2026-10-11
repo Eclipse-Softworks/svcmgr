@@ -1,4 +1,4 @@
-﻿package cmd
+package cmd
 
 import (
 	"github.com/moon9t/svcmgr/internal/config"
@@ -32,3 +32,5 @@ func runLogin(cmd *cobra.Command, args []string) {
 		log.Fatal().Err(err).Msg("Failed to establish cosmic connection")
 	}
 }
+
+func init() { rootCmd.AddCommand(loginCmd) }

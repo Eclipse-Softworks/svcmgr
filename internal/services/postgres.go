@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (h *PostgresHandler) Handle(s config.Service, pwd string) error {
+func (h *PostgresHandler) connect(s config.Service, pwd string) error {
 	var extra map[string]interface{}
 	if err := json.Unmarshal([]byte(s.Extra), &extra); err != nil {
 		return fmt.Errorf("failed to parse extra: %v", err)

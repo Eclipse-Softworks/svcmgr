@@ -30,11 +30,15 @@ var backupCmd = &cobra.Command{
 func init() {
 	backupCmd.Flags().BoolVarP(&forceBackup, "force", "f", false,
 		"Bypass cosmic confirmation")
-	backupCmd.Flags().StringVarP(&backupBucket, "bucket", "b", "moon9t-cosmic-vault",
+	backupCmd.Flags().StringVarP(&backupBucket, "bucket", "b", "",
 		"Celestial storage bucket")
+	rootCmd.AddCommand(backupCmd)
 }
 
 func runBackup(cmd *cobra.Command, args []string) {
+	if backupBucket == "" {
+		log.Fatal().Msg("Pass a bucket with --bucket")
+	}
 	if !forceBackup {
 		confirm := false
 		prompt := &survey.Confirm{

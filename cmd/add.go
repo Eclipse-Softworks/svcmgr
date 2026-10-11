@@ -1,4 +1,4 @@
-﻿package cmd
+package cmd
 
 import (
 	"fmt"
@@ -86,8 +86,10 @@ func runAdd(cmd *cobra.Command, args []string) {
 	}
 
 	if err := service.Save(); err != nil {
-		log.Fatal().Err(err.(error)).Msg("Failed to save cosmic configuration")
+		log.Fatal().Err(err).Msg("Failed to save cosmic configuration")
 	}
 
 	fmt.Printf("\n%s Service '%s' added to constellation!\n", ui.SuccessIcon(), service.Name)
 }
+
+func init() { rootCmd.AddCommand(addCmd) }
